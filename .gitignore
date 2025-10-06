@@ -1,0 +1,33 @@
+# Arquivo para ignorar arquivos e pastas desnecessários no Git
+
+# 1. Ambiente Virtual
+# Ignora a pasta do nosso ambiente virtual do Python. Essencial!
+venv/
+.venv/
+
+# 2. Cache e arquivos compilados do Python
+# Pastas de cache que o Python cria automaticamente.
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# 3. Banco de Dados SQLite
+# Ignora o arquivo do banco de dados. Nós versionamos o script de criação (schema.sql),
+# mas não o banco de dados em si, que muda constantemente.
+*.db
+*.sqlite
+*.sqlite3
+
+# 4. Arquivos de configuração do Editor/IDE
+# Ignora configurações específicas do usuário do VS Code.
+.vscode/
+
+# 5. Arquivos de dependências (se usarmos)
+# Se gerarmos um arquivo com a lista de pacotes, ele não precisa ser ignorado.
+# Mas a pasta onde eles são instalados, sim. (Já coberto pelo venv)
+
+# 6. Arquivos de sistema operacional
+# Arquivos de metadados do macOS e Windows.
+.DS_Store
+Thumbs.db
