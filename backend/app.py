@@ -4,6 +4,10 @@ from flask_bcrypt import Bcrypt
 
 app = Flask(__name__)
 
+app.config['MYSQL_PASSWORD'] = "FAmilia36#"
+
+bcrypt = Bcrypt(app)
+
 # --- LÓGICA DE CONEXÃO ATUALIZADA PARA MYSQL ---
 def get_db_connection():
     conn = mysql.connector.connect(
@@ -35,6 +39,7 @@ def teste_db():
     except Exception as e:
         return jsonify(message="Erro ao conectar com o banco de dados.", error=str(e)), 500
 
+# --- 4. ROTA DE LOGIN ATUALIZADA ---
 @app.route('/api/login', methods=['POST'])
 def login():
     dados = request.get_json()
@@ -42,23 +47,18 @@ def login():
         return jsonify({"status": "erro", "message": "Dados de login ausentes"}), 400
 
     email = dados['email']
-    senha = dados['senha']
+    senha_texto_puro = dados['senha']
 
     try:
         conn = get_db_connection()
-        # dictionary=True faz o cursor retornar resultados como dicionários (coluna: valor)
         cursor = conn.cursor(dictionary=True)
-
-        # A sintaxe de placeholder do MySQL usa '%s' em vez de '?'
         cursor.execute('SELECT * FROM Usuario WHERE Email = %s', (email,))
         usuario = cursor.fetchone()
-        
         cursor.close()
         conn.close()
 
-        # ATENÇÃO: Verificação de senha em texto plano (temporário)
-        if usuario and usuario['Senha_Criptografada'] == senha:
-            # Remove a senha da resposta por segurança
+        # Compara o hash do banco com a senha enviada
+        if usuario and bcrypt.check_password_hash(usuario['Senha_Criptografada'], senha_texto_puro):
             del usuario['Senha_Criptografada']
             return jsonify({
                 "status": "sucesso",
@@ -358,6 +358,44 @@ def atualizar_status_pedido(id_pedido):
 
     except Exception as e:
         return jsonify(message="Erro interno no servidor ao atualizar o pedido.", error=str(e)), 500
+
+# --- 3. NOVA ROTA PARA REGISTRAR USUÁRIOS ---
+@app.route('/api/usuarios/registrar', methods=['POST'])
+def registrar_usuario():
+    dados = request.get_json()
+    
+    required_fields = ['nome', 'email', 'senha', 'perfil']
+    if not all(field in dados for field in required_fields):
+        return jsonify({"status": "erro", "message": "Dados de registro incompletos"}), 400
+
+    nome = dados['nome']
+    email = dados['email']
+    senha_texto_puro = dados['senha']
+    perfil = dados['perfil']
+
+    # Gera o hash da senha
+    hash_senha = bcrypt.generate_password_hash(senha_texto_puro).decode('utf-8')
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        sql = "INSERT INTO Usuario (Nome, Email, Senha_Criptografada, Perfil) VALUES (%s, %s, %s, %s)"
+        cursor.execute(sql, (nome, email, hash_senha, perfil))
+        conn.commit()
+        
+        cursor.close()
+        conn.close()
+        
+        return jsonify({"status": "sucesso", "message": "Usuário registrado com sucesso!"}), 201
+    except mysql.connector.Error as err:
+        # Erro de email duplicado
+        if err.errno == 1062:
+             return jsonify({"status": "erro", "message": "Este e-mail já está em uso."}), 409
+        return jsonify({"status": "erro", "message": "Erro no banco de dados.", "error": str(err)}), 500
+
+
+
 
 # Bloco de execução principal
 if __name__ == '__main__':

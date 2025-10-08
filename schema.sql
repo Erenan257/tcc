@@ -88,3 +88,4 @@ CREATE TABLE Itens_Pedido (
     FOREIGN KEY (ID_Pedido) REFERENCES Pedido_Reposicao(ID_Pedido),
     FOREIGN KEY (ID_Insumo) REFERENCES Insumo(ID_Insumo)
 );
+
