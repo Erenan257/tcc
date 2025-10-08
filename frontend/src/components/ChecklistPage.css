@@ -1,0 +1,141 @@
+/* --- ESTILOS PARA CHECKLISTPAGE.CSS --- */
+
+/* 1. Layout Principal da Página */
+.checklist-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centraliza o formulário horizontalmente */
+  width: 100%;
+  min-height: 100vh;
+  background-color: #f0f2f5; /* Fundo cinza claro, igual às outras telas */
+  font-family: sans-serif;
+  padding: 40px 20px; /* Espaçamento em cima/embaixo e nas laterais */
+  box-sizing: border-box; /* Garante que o padding não quebre o layout */
+}
+
+/* 2. Formulário que Contém a Lista */
+/* Esta é a "caixa" branca central que segura o conteúdo */
+.checklist-form {
+  width: 100%;
+  max-width: 350px; /* O formulário tem uma largura máxima para não ficar muito largo em telas grandes */
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.checklist-form h1 {
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 30px;
+  color: #1c1e21;
+}
+
+/* 3. Lista de Itens */
+.checklist-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 15px;
+  border-bottom: 2px solid #dddfe2;
+  font-weight: bold;
+  color: #606770;
+}
+
+.checklist-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border-bottom: 1px solid #f0f2f5;
+}
+
+.item-name {
+  flex-grow: 1;
+  color: #1c1e21;
+  font-size: 1rem;
+}
+
+.item-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.status-button {
+  padding: 8px 12px;
+  border: 1px solid #dddfe2;
+  border-radius: 6px;
+  background-color: #f5f6f7;
+  cursor: pointer;
+  font-weight: bold;
+  min-width: 80px;
+}
+
+.status-button:hover {
+  background-color: #e9ebee;
+}
+
+.submit-button {
+  margin-top: 30px;
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 6px;
+  background-color: #1877f2;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.submit-button:hover {
+  background-color: #166fe5;
+}
+
+
+/* 4. REGRAS PARA TELAS PEQUENAS (DESIGN RESPONSIVO) */
+@media (max-width: 600px) {
+  .checklist-container {
+    padding: 0; /* Remove o padding em telas de celular */
+  }
+
+  .checklist-form {
+    box-shadow: none;
+    border-radius: 0;
+    padding: 20px 15px;
+  }
+
+  .checklist-form h1 {
+    font-size: 1.5rem;
+  }
+
+  .checklist-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .item-actions {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .status-button {
+    flex-grow: 1;
+  }
+}
+
+/* --- ESTILOS PARA BOTÕES DE STATUS SELECIONADOS --- */
+
+.status-button.selected-presente {
+  background-color: #42b72a; /* Verde */
+  color: white;
+  border-color: #42b72a;
+}
+
+.status-button.selected-ausente {
+  background-color: #fa383e; /* Vermelho */
+  color: white;
+  border-color: #fa383e;
+}

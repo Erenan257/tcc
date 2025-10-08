@@ -1,0 +1,86 @@
+/* Centraliza o container do login na tela inteira */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f0f2f5;
+  font-family: sans-serif;
+}
+
+/* Estiliza a caixa do formulário */
+.login-form {
+  background: white;
+  padding: 40px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.login-form h2 {
+  margin-bottom: 24px;
+  color: #1c1e21;
+}
+
+/* Agrupa label e input */
+.input-group {
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #606770;
+  font-weight: bold;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #dddfe2;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+/* Estiliza o botão de entrar */
+button[type="submit"] {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  background-color: #1877f2;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+button[type="submit"]:hover {
+  background-color: #166fe5;
+}
+
+/* Estiliza o link de "Esqueci minha senha" */
+.forgot-password {
+  display: block;
+  margin-top: 16px;
+  color: #1877f2;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.forgot-password:hover {
+  text-decoration: underline;
+}
+
+.feedback-message {
+  color: rgb(0, 0, 0) !important;
+  font-weight: bold !important;
+  border: 1px solid green !important;
+  padding: 10px !important;
+  margin-bottom: 1rem !important;
+  border-radius: 5px;
+}

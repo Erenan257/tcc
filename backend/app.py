@@ -1,8 +1,11 @@
 import mysql.connector
 from flask import Flask, jsonify, request
 from flask_bcrypt import Bcrypt
+from flask_cors import CORS
+
 
 app = Flask(__name__)
+CORS(app)
 
 app.config['MYSQL_PASSWORD'] = "FAmilia36#"
 
@@ -39,7 +42,7 @@ def teste_db():
     except Exception as e:
         return jsonify(message="Erro ao conectar com o banco de dados.", error=str(e)), 500
 
-# --- 4. ROTA DE LOGIN ATUALIZADA ---
+# --- ROTA DE LOGIN ATUALIZADA COM VERIFICAÇÃO DE USUÁRIO ATIVO ---
 @app.route('/api/login', methods=['POST'])
 def login():
     dados = request.get_json()
@@ -52,24 +55,34 @@ def login():
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute('SELECT * FROM Usuario WHERE Email = %s', (email,))
+        
+        # AQUI ESTÁ A MUDANÇA: Adicionamos a condição para buscar apenas usuários ativos
+        sql = "SELECT * FROM Usuario WHERE Email = %s AND is_active = TRUE"
+        cursor.execute(sql, (email,))
         usuario = cursor.fetchone()
+        
         cursor.close()
         conn.close()
 
         # Compara o hash do banco com a senha enviada
         if usuario and bcrypt.check_password_hash(usuario['Senha_Criptografada'], senha_texto_puro):
+            # Remove a senha e o status de ativo da resposta por segurança e clareza
             del usuario['Senha_Criptografada']
+            del usuario['is_active']
+            
             return jsonify({
                 "status": "sucesso",
                 "message": "Login bem-sucedido!",
                 "usuario": usuario
             })
         else:
+            # A mensagem de erro é a mesma para não dar pistas (se o email existe ou se o usuário está inativo)
             return jsonify({"status": "erro", "message": "E-mail ou senha inválidos"}), 401
+            
     except Exception as e:
         return jsonify(message="Erro interno no servidor.", error=str(e)), 500
 
+# --- ROTAS PARA CRUD DE INSUMOS ---
 # --- NOVA ROTA PARA BUSCAR INSUMOS ---
 @app.route('/api/insumos', methods=['GET'])
 def get_insumos():
@@ -86,7 +99,112 @@ def get_insumos():
         return jsonify(insumos)
     except Exception as e:
         return jsonify(message="Erro interno no servidor ao buscar insumos.", error=str(e)), 500
-    
+
+# --- NOVA ROTA PARA CRIAR UM NOVO INSUMO ---
+@app.route('/api/insumos', methods=['POST'])
+def criar_insumo():
+    # FUTURAMENTE: Proteger esta rota para que apenas gestores possam usar.
+    dados = request.get_json()
+
+    required_fields = ['nome_insumo', 'unidade_medida', 'quantidade_minima']
+    if not all(field in dados for field in required_fields):
+        return jsonify({"status": "erro", "message": "Dados do insumo incompletos"}), 400
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        sql = """
+            INSERT INTO Insumo (Nome_Insumo, Unidade_Medida, Quantidade_Minima, Descricao, Critico, Categoria)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """
+        cursor.execute(sql, (
+            dados['nome_insumo'],
+            dados['unidade_medida'],
+            dados['quantidade_minima'],
+            dados.get('descricao', ''),  # .get() para campos opcionais
+            dados.get('critico', False),
+            dados.get('categoria', '')
+        ))
+        conn.commit()
+        
+        id_novo_insumo = cursor.lastrowid
+        cursor.close()
+        conn.close()
+
+        return jsonify({"status": "sucesso", "message": "Insumo criado com sucesso!", "id_insumo": id_novo_insumo}), 201
+
+    except mysql.connector.Error as err:
+        return jsonify({"status": "erro", "message": "Erro no banco de dados ao criar insumo.", "error": str(err)}), 500
+
+# --- ROTA PARA EDITAR UM INSUMO EXISTENTE ---
+@app.route('/api/insumos/<int:id_insumo>', methods=['PUT'])
+def atualizar_insumo(id_insumo):
+    # FUTURAMENTE: Proteger esta rota.
+    dados = request.get_json()
+
+    required_fields = ['nome_insumo', 'unidade_medida', 'quantidade_minima']
+    if not all(field in dados for field in required_fields):
+        return jsonify({"status": "erro", "message": "Dados do insumo incompletos"}), 400
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        sql = """
+            UPDATE Insumo SET 
+                Nome_Insumo = %s, Unidade_Medida = %s, Quantidade_Minima = %s, 
+                Descricao = %s, Critico = %s, Categoria = %s
+            WHERE ID_Insumo = %s
+        """
+        cursor.execute(sql, (
+            dados['nome_insumo'],
+            dados['unidade_medida'],
+            dados['quantidade_minima'],
+            dados.get('descricao', ''),
+            dados.get('critico', False),
+            dados.get('categoria', ''),
+            id_insumo
+        ))
+        conn.commit()
+
+        if cursor.rowcount == 0:
+            return jsonify({"status": "erro", "message": "Insumo não encontrado"}), 404
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({"status": "sucesso", "message": f"Insumo com ID {id_insumo} atualizado com sucesso."})
+
+    except mysql.connector.Error as err:
+        return jsonify({"status": "erro", "message": "Erro no banco de dados ao atualizar insumo.", "error": str(err)}), 500
+
+# --- ROTA PARA EXCLUIR UM INSUMO ---
+@app.route('/api/insumos/<int:id_insumo>', methods=['DELETE'])
+def deletar_insumo(id_insumo):
+    # FUTURAMENTE: Proteger esta rota.
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        sql = "DELETE FROM Insumo WHERE ID_Insumo = %s"
+        cursor.execute(sql, (id_insumo,))
+        conn.commit()
+
+        if cursor.rowcount == 0:
+            return jsonify({"status": "erro", "message": "Insumo não encontrado"}), 404
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({"status": "sucesso", "message": f"Insumo com ID {id_insumo} excluído com sucesso."})
+
+    except mysql.connector.Error as err:
+        # Erro de chave estrangeira: o insumo está em uso em um checklist/pedido.
+        if err.errno == 1451:
+            return jsonify({"status": "erro", "message": "Não é possível excluir este insumo, pois ele já está associado a checklists ou pedidos."}), 409 # Conflict
+        return jsonify({"status": "erro", "message": "Erro no banco de dados.", "error": str(err)}), 500
+
 # --- NOVA ROTA PARA SUBMETER UM CHECKLIST ---
 @app.route('/api/checklists', methods=['POST'])
 def criar_checklist():
@@ -394,8 +512,158 @@ def registrar_usuario():
              return jsonify({"status": "erro", "message": "Este e-mail já está em uso."}), 409
         return jsonify({"status": "erro", "message": "Erro no banco de dados.", "error": str(err)}), 500
 
+# --- NOVA ROTA PARA GESTOR LISTAR USUÁRIOS ---
+@app.route('/api/usuarios', methods=['GET'])
+def get_usuarios():
+    # FUTURAMENTE: Adicionaremos aqui uma verificação para garantir que apenas um 'Gestor' pode acessar esta rota.
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
 
+        # Selecionamos os campos importantes, EXCLUINDO a senha.
+        sql = "SELECT ID_Usuario, Nome, Email, Perfil, Matricula_Empresa, CPF FROM Usuario WHERE is_active = TRUE ORDER BY Nome ASC"
+        cursor.execute(sql)
+        usuarios = cursor.fetchall()
 
+        cursor.close()
+        conn.close()
+
+        return jsonify(usuarios)
+
+    except Exception as e:
+        return jsonify(message="Erro interno no servidor ao buscar usuários.", error=str(e)), 500
+
+# --- NOVA ROTA PARA GESTOR CRIAR UM NOVO USUÁRIO ---
+@app.route('/api/usuarios', methods=['POST'])
+def criar_usuario():
+    # FUTURAMENTE: Adicionaremos aqui uma verificação para garantir que apenas um 'Gestor' pode acessar esta rota.
+    dados = request.get_json()
+    
+    required_fields = ['nome', 'email', 'senha', 'perfil']
+    if not all(field in dados for field in required_fields):
+        return jsonify({"status": "erro", "message": "Dados de registro incompletos"}), 400
+
+    nome = dados['nome']
+    email = dados['email']
+    senha_texto_puro = dados['senha']
+    perfil = dados['perfil']
+
+    # Gera o hash da senha, reutilizando nossa lógica segura
+    hash_senha = bcrypt.generate_password_hash(senha_texto_puro).decode('utf-8')
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        sql = "INSERT INTO Usuario (Nome, Email, Senha_Criptografada, Perfil) VALUES (%s, %s, %s, %s)"
+        cursor.execute(sql, (nome, email, hash_senha, perfil))
+        conn.commit()
+        
+        id_novo_usuario = cursor.lastrowid
+        cursor.close()
+        conn.close()
+        
+        return jsonify({"status": "sucesso", "message": "Usuário criado com sucesso!", "id_usuario": id_novo_usuario}), 201
+    
+    except mysql.connector.Error as err:
+        # Erro de email duplicado
+        if err.errno == 1062:
+             return jsonify({"status": "erro", "message": "Este e-mail já está em uso."}), 409
+        return jsonify({"status": "erro", "message": "Erro no banco de dados.", "error": str(err)}), 500
+
+# --- NOVA ROTA PARA GESTOR EDITAR UM USUÁRIO ---
+@app.route('/api/usuarios/<int:id_usuario>', methods=['PUT'])
+def atualizar_usuario(id_usuario):
+    # FUTURAMENTE: Proteger esta rota para que apenas gestores possam editar usuários.
+    dados = request.get_json()
+
+    required_fields = ['nome', 'email', 'perfil']
+    if not all(field in dados for field in required_fields):
+        return jsonify({"status": "erro", "message": "Dados de atualização incompletos"}), 400
+
+    nome = dados['nome']
+    email = dados['email']
+    perfil = dados['perfil']
+    
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        sql = "UPDATE Usuario SET Nome = %s, Email = %s, Perfil = %s WHERE ID_Usuario = %s"
+        cursor.execute(sql, (nome, email, perfil, id_usuario))
+        
+        conn.commit()
+
+        if cursor.rowcount == 0:
+            return jsonify({"status": "erro", "message": "Usuário não encontrado"}), 404
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({"status": "sucesso", "message": f"Usuário com ID {id_usuario} atualizado com sucesso."})
+
+    except mysql.connector.Error as err:
+        # Erro de email duplicado
+        if err.errno == 1062:
+             return jsonify({"status": "erro", "message": "Este e-mail já está em uso por outro usuário."}), 409
+        return jsonify({"status": "erro", "message": "Erro no banco de dados.", "error": str(err)}), 500
+
+# --- ROTA ATUALIZADA PARA INATIVAR UM USUÁRIO (SOFT DELETE) ---
+@app.route('/api/usuarios/<int:id_usuario>', methods=['DELETE'])
+def deletar_usuario(id_usuario):
+    # FUTURAMENTE: Proteger esta rota.
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Em vez de DELETAR, nós ATUALIZAMOS o status do usuário para inativo.
+        sql = "UPDATE Usuario SET is_active = FALSE WHERE ID_Usuario = %s"
+        cursor.execute(sql, (id_usuario,))
+        
+        conn.commit()
+
+        if cursor.rowcount == 0:
+            return jsonify({"status": "erro", "message": "Usuário não encontrado"}), 404
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({"status": "sucesso", "message": f"Usuário com ID {id_usuario} foi inativado."})
+
+    except Exception as e:
+        return jsonify(message="Erro interno no servidor ao inativar o usuário.", error=str(e)), 500
+
+# --- NOVA ROTA PARA ATUALIZAR PARCIALMENTE UM USUÁRIO (EX: REATIVAR) ---
+@app.route('/api/usuarios/<int:id_usuario>', methods=['PATCH'])
+def atualizar_parcial_usuario(id_usuario):
+    # FUTURAMENTE: Proteger esta rota para que apenas gestores possam usar.
+    dados = request.get_json()
+
+    if not dados or 'is_active' not in dados:
+        return jsonify({"status": "erro", "message": "Nenhuma ação de status fornecida (ex: {'is_active': true})"}), 400
+
+    is_active = bool(dados['is_active'])
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        sql = "UPDATE Usuario SET is_active = %s WHERE ID_Usuario = %s"
+        cursor.execute(sql, (is_active, id_usuario))
+        
+        conn.commit()
+
+        if cursor.rowcount == 0:
+            return jsonify({"status": "erro", "message": "Usuário não encontrado"}), 404
+
+        cursor.close()
+        conn.close()
+
+        status_texto = "reativado" if is_active else "inativado"
+        return jsonify({"status": "sucesso", "message": f"Usuário com ID {id_usuario} foi {status_texto}."})
+
+    except Exception as e:
+        return jsonify(message="Erro interno no servidor ao atualizar o usuário.", error=str(e)), 500
 
 # Bloco de execução principal
 if __name__ == '__main__':

@@ -1,0 +1,57 @@
+.pedidos-container {
+  width: 100%;
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 30px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  font-family: sans-serif;
+}
+
+.pedidos-container h1 {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.pedido-header, .pedido-item {
+  display: grid;
+  grid-template-columns: 0.5fr 1fr 1fr 1fr; /* Define 4 colunas com tamanhos diferentes */
+  gap: 15px;
+  padding: 15px;
+  align-items: center;
+  border-bottom: 1px solid #f0f2f5;
+}
+
+.pedido-header {
+  font-weight: bold;
+  color: #606770;
+  border-bottom: 2px solid #dddfe2;
+}
+
+.pedido-item {
+  color: #1c1e21;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+}
+
+.pedido-item:hover {
+  background-color: #f5f6f7;
+}
+
+.status {
+  font-weight: bold;
+  padding: 5px 10px;
+  border-radius: 15px;
+  text-align: center;
+}
+
+.status-pendente {
+  background-color: #fff0c2;
+  color: #f79200;
+}
+
+.status-atendido {
+  background-color: #d4edda;
+  color: #155724;
+}

@@ -1,0 +1,58 @@
+/* Container principal do dashboard */
+.dashboard-container {
+  display: flex;
+  flex-direction: column; /* Organiza os filhos (header e main) em uma coluna vertical */
+  height: 100vh;
+  background-color: #f0f2f5;
+  font-family: sans-serif;
+  text-align: center;
+}
+
+/* Cabeçalho do dashboard */
+.dashboard-header {
+  background-color: #ffffff;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid #dddfe2;
+}
+
+.dashboard-header h1 {
+  margin: 0;
+  color: #1c1e21;
+}
+
+.dashboard-header p {
+  margin: 5px 0 0;
+  color: #606770;
+  font-size: 1.1rem;
+}
+
+/* Área principal onde os botões ficarão */
+.dashboard-main {
+  flex-grow: 1; /* Faz esta área ocupar todo o espaço vertical restante */
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Centraliza os botões verticalmente */
+  align-items: center;   /* Centraliza os botões horizontalmente */
+  padding: 20px;
+}
+
+/* Estilo dos botões de ação do dashboard */
+.dashboard-button {
+  width: 100%;
+  max-width: 350px; /* Limita a largura máxima dos botões */
+  padding: 18px 20px;
+  margin: 10px 0;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: white;
+  background-color: #1877f2;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease; /* Efeito suave de transição */
+}
+
+.dashboard-button:hover {
+  background-color: #166fe5; /* Cor um pouco mais escura ao passar o mouse */
+}
