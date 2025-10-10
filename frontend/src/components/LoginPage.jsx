@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // 1. Importar o useNavigate
 import './LoginPage.css';
 
 // 2. Agora o componente recebe a propriedade 'onLoginSuccess'
@@ -7,8 +6,6 @@ function LoginPage({ onLoginSuccess }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
-  const navigate = useNavigate(); // 3. Inicializar o hook de navegação
-
   const handleSubmit = async (event) => {
     event.preventDefault();
     setMessage('');
@@ -22,10 +19,10 @@ function LoginPage({ onLoginSuccess }) {
 
       const data = await response.json();
 
-      if (data.status === 'sucesso') {
-        // 4. Se o login deu certo:
-        onLoginSuccess(data.usuario); // Avisa o App.jsx, passando os dados do usuário
-        navigate('/dashboard'); // Navega para o dashboard
+      if (response.ok) {
+        // Se o login deu certo, ele apenas CHAMA A FUNÇÃO que recebeu do App.jsx
+        onLoginSuccess(data.usuario);
+        // A linha 'navigate(...)' FOI REMOVIDA daqui
       } else {
         setMessage(data.message);
       }

@@ -4,8 +4,9 @@ from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 import mysql.connector
 
+
 bcrypt = Bcrypt()
-cors = CORS()
+cors = CORS(resources={r"/api/*": {"origins": "*"}})
 
 def get_db_connection():
     conn = mysql.connector.connect(

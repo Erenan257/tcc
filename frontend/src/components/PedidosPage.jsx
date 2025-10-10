@@ -37,6 +37,11 @@ function PedidosPage() {
 
   return (
     <div className="pedidos-container">
+      <div className="admin-nav">
+        <Link to="/admin/pedidos">Ver Pedidos</Link>
+        <Link to="/admin/usuarios">Gerenciar Usuários</Link>
+        {/* Futuramente: <Link to="/admin/insumos">Gerenciar Insumos</Link> */}
+      </div>
       <h1>Meus Pedidos de Reposição</h1>
       <div className="pedidos-list">
         <div className="pedido-header">

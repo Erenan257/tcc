@@ -45,7 +45,7 @@ def registrar_usuario():
     if not all(field in dados for field in required_fields):
         return jsonify({"status": "erro", "message": "Dados de registro incompletos"}), 400
 
-    nome = dados['nome']
+    nome = dados['nome'].title()
     email = dados['email']
     senha_texto_puro = dados['senha']
     perfil = dados['perfil'].capitalize()

@@ -139,3 +139,21 @@
   color: white;
   border-color: #fa383e;
 }
+
+/* Adicione este código ao seu CSS */
+
+.quantity-input {
+  width: 80px;
+  padding: 8px;
+  text-align: center;
+  border: 1px solid #dddfe2;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+/* Um pequeno ajuste no nome do item para mostrar a quantidade mínima */
+.item-name {
+  flex-grow: 1;
+  color: #1c1e21;
+  font-size: 1rem;
+}

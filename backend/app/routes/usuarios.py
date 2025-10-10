@@ -29,7 +29,7 @@ def handle_usuarios():
         dados = request.get_json()
         required_fields = ['nome', 'email', 'senha', 'perfil']
         if not all(field in dados for field in required_fields): return jsonify({"status": "erro", "message": "Dados incompletos"}), 400
-        nome = dados['nome']
+        nome = dados['nome'].title()
         email = dados['email']
         senha_texto_puro = dados['senha']
         perfil = dados['perfil'].capitalize()
@@ -57,7 +57,7 @@ def handle_usuario_by_id(id_usuario):
         dados = request.get_json()
         required_fields = ['nome', 'email', 'perfil']
         if not all(field in dados for field in required_fields): return jsonify({"status": "erro", "message": "Dados de atualização incompletos"}), 400
-        nome = dados['nome']
+        nome = dados['nome'].title()
         email = dados['email']
         perfil = dados['perfil'].capitalize()
         try:
