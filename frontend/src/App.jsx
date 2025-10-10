@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-// 1. Importamos useNavigate aqui
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import LoginPage from './components/LoginPage';
 import DashboardPage from './components/DashboardPage';
@@ -7,36 +6,45 @@ import ChecklistPage from './components/ChecklistPage';
 import PedidosPage from './components/PedidosPage';
 import AdminUsuariosPage from './components/AdminUsuariosPage';
 import PedidoDetailPage from './components/PedidoDetailPage';
+import UsuarioFormPage from './components/UsuarioFormPage';
+import AdminInsumosPage from './components/AdminInsumosPage';
+import InsumoFormPage from './components/InsumoFormPage';
 import './App.css';
 
-// Criamos um componente interno para poder usar o hook useNavigate
 function AppRoutes() {
   const [usuarioLogado, setUsuarioLogado] = useState(null);
-  const navigate = useNavigate(); // O hook de navegação agora vive aqui
+  const navigate = useNavigate();
 
-  // Esta função agora contém a lógica de redirecionamento
   const handleLoginSuccess = (dadosUsuario) => {
-    setUsuarioLogado(dadosUsuario); // Guarda os dados do usuário no estado
+    setUsuarioLogado(dadosUsuario);
 
-    // 2. LÓGICA DE REDIRECIONAMENTO BASEADA NO PERFIL
-    if (dadosUsuario.Perfil === 'Socorrista') {
+    // Esta lógica continua correta para o momento do login
+    if (dadosUsuario.Perfil === 'Socorrista') { // 
       navigate('/dashboard');
-    } else if (dadosUsuario.Perfil === 'Farmacia' || dadosUsuario.Perfil === 'Gestor') {
-      // A página inicial para perfis administrativos será a de pedidos
+    } else if (dadosUsuario.Perfil === 'Farmacia' || dadosUsuario.Perfil === 'Gestor') { // 
       navigate('/admin/pedidos');
     } else {
-      // Se por algum motivo não tiver perfil, volta para o login
       navigate('/');
     }
   };
 
-  // As rotas que já criamos
   return (
     <Routes>
       <Route 
         path="/" 
-        element={!usuarioLogado ? <LoginPage onLoginSuccess={handleLoginSuccess} /> : <Navigate to="/dashboard" />} 
+        element={
+          // Se NÃO houver usuário logado, mostre a LoginPage
+          !usuarioLogado ? (
+            <LoginPage onLoginSuccess={handleLoginSuccess} />
+          ) : (
+            // AQUI ESTÁ A CORREÇÃO:
+            // Se HOUVER um usuário logado, verifique o perfil dele para decidir para onde redirecionar
+            usuarioLogado.Perfil === 'Socorrista' ? <Navigate to="/dashboard" /> : <Navigate to="/admin/pedidos" />
+          )
+        } 
       />
+      
+      {/* O resto das rotas continua igual */}
       <Route 
         path="/dashboard" 
         element={usuarioLogado ? <DashboardPage usuario={usuarioLogado} /> : <Navigate to="/" />} 
@@ -49,7 +57,7 @@ function AppRoutes() {
         path="/pedidos" 
         element={usuarioLogado ? <PedidosPage /> : <Navigate to="/" />} 
       />
-       <Route 
+      <Route 
         path="/pedidos/:id_pedido" 
         element={usuarioLogado ? <PedidoDetailPage /> : <Navigate to="/" />} 
       />
@@ -61,11 +69,30 @@ function AppRoutes() {
         path="/admin/usuarios" 
         element={usuarioLogado ? <AdminUsuariosPage /> : <Navigate to="/" />} 
       />
+      <Route 
+          path="/admin/usuarios/novo" 
+          element={usuarioLogado ? <UsuarioFormPage /> : <Navigate to="/" />} 
+        />
+      <Route 
+          path="/admin/usuarios/:id_usuario" 
+          element={usuarioLogado ? <UsuarioFormPage /> : <Navigate to="/" />} 
+        />
+      <Route 
+          path="/admin/insumos" 
+          element={usuarioLogado ? <AdminInsumosPage /> : <Navigate to="/" />} 
+        />
+      <Route 
+          path="/admin/insumos/novo" 
+          element={usuarioLogado ? <InsumoFormPage /> : <Navigate to="/" />} 
+        />
+      <Route 
+          path="/admin/insumos/:id_insumo" 
+          element={usuarioLogado ? <InsumoFormPage /> : <Navigate to="/" />} 
+        />
     </Routes>
   );
 }
 
-// O componente App principal apenas prepara o BrowserRouter
 function App() {
   return (
     <BrowserRouter>

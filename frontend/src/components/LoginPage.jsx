@@ -21,6 +21,7 @@ function LoginPage({ onLoginSuccess }) {
 
       if (response.ok) {
         // Se o login deu certo, ele apenas CHAMA A FUNÇÃO que recebeu do App.jsx
+        console.log('Login API OK! Avisando o componente App.jsx com os dados:', data.usuario);
         onLoginSuccess(data.usuario);
         // A linha 'navigate(...)' FOI REMOVIDA daqui
       } else {

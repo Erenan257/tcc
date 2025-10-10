@@ -40,6 +40,7 @@ function PedidosPage() {
       <div className="admin-nav">
         <Link to="/admin/pedidos">Ver Pedidos</Link>
         <Link to="/admin/usuarios">Gerenciar Usuários</Link>
+        <Link to="/admin/insumos">Gerenciar Insumos</Link>
         {/* Futuramente: <Link to="/admin/insumos">Gerenciar Insumos</Link> */}
       </div>
       <h1>Meus Pedidos de Reposição</h1>

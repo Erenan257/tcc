@@ -5,10 +5,10 @@ from app import bcrypt, get_db_connection
 import mysql.connector
 
 # O prefixo /api/usuarios será adicionado a todas as rotas abaixo
-bp = Blueprint('usuarios', __name__, url_prefix='/api/usuarios')
+bp = Blueprint('usuarios', __name__, url_prefix='/api')
 
 # Rota para LISTAR (GET) e CRIAR (POST) usuários
-@bp.route('/', methods=['GET', 'POST'])
+@bp.route('/usuarios', methods=['GET', 'POST'])
 def handle_usuarios():
     # FUTURAMENTE: Proteger para que apenas Gestores acessem
     if request.method == 'GET':
@@ -49,11 +49,29 @@ def handle_usuarios():
             return jsonify({"status": "erro", "message": "Erro no banco de dados.", "error": str(err)}), 500
 
 # Rota para EDITAR (PUT), INATIVAR (DELETE) e REATIVAR (PATCH) um usuário
-@bp.route('/<int:id_usuario>', methods=['PUT', 'DELETE', 'PATCH'])
+@bp.route('/usuarios/<int:id_usuario>', methods=['GET', 'PUT', 'DELETE', 'PATCH'])
 def handle_usuario_by_id(id_usuario):
     # FUTURAMENTE: Proteger para que apenas Gestores acessem
+
+    if request.method == 'GET':
+        # Lógica para buscar um usuário por ID
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor(dictionary=True)
+            sql = "SELECT ID_Usuario, Nome, Email, Perfil FROM Usuario WHERE ID_Usuario = %s"
+            cursor.execute(sql, (id_usuario,))
+            usuario = cursor.fetchone()
+            cursor.close()
+            conn.close()
+            if usuario:
+                return jsonify(usuario)
+            else:
+                return jsonify({"status": "erro", "message": "Usuário não encontrado"}), 404
+        except Exception as e:
+            return jsonify(message="Erro ao buscar usuário.", error=str(e)), 500
+
     
-    if request.method == 'PUT':
+    elif request.method == 'PUT':
         dados = request.get_json()
         required_fields = ['nome', 'email', 'perfil']
         if not all(field in dados for field in required_fields): return jsonify({"status": "erro", "message": "Dados de atualização incompletos"}), 400

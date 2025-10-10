@@ -43,9 +43,24 @@ def handle_insumos():
             return jsonify({"status": "erro", "message": "Erro no banco de dados ao criar insumo.", "error": str(err)}), 500
 
 # Rota para EDITAR (PUT) e EXCLUIR (DELETE) um insumo específico
-@bp.route('/<int:id_insumo>', methods=['PUT', 'DELETE'])
+@bp.route('/<int:id_insumo>', methods=['GET', 'PUT', 'DELETE'])
 def handle_insumo_by_id(id_insumo):
-    if request.method == 'PUT':
+    if request.method == 'GET':
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor(dictionary=True)
+            cursor.execute("SELECT * FROM Insumo WHERE ID_Insumo = %s", (id_insumo,))
+            insumo = cursor.fetchone()
+            cursor.close()
+            conn.close()
+            if insumo:
+                return jsonify(insumo)
+            else:
+                return jsonify({"status": "erro", "message": "Insumo não encontrado"}), 404
+        except Exception as e:
+            return jsonify(message="Erro ao buscar insumo.", error=str(e)), 500
+
+    elif request.method == 'PUT':
         dados = request.get_json()
         required_fields = ['nome_insumo', 'unidade_medida', 'quantidade_minima']
         if not all(field in dados for field in required_fields):

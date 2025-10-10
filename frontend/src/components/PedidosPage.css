@@ -70,3 +70,34 @@
   color: #1877f2;
   font-size: 1.1rem;
 }
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.btn-new {
+  background-color: #42b72a;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+/* No final de PedidosPage.css */
+.action-button {
+  padding: 5px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: #f0f2f5;
+}
+.action-button.edit {
+  background-color: #e4e6eb;
+  color: #050505;
+  text-decoration: none;
+  font-size: 14px; /* Ajuste para o tamanho do botão */
+}
