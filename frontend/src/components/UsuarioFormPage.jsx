@@ -1,33 +1,29 @@
 import React, { useState, useEffect } from 'react';
-// 1. Importamos useParams para ler o ID da URL
 import { useNavigate, useParams } from 'react-router-dom';
 import './LoginPage.css';
 
 function UsuarioFormPage() {
   const navigate = useNavigate();
-  // 2. Usamos useParams para pegar o id_usuario da URL.
-  // Ex: na URL '/admin/usuarios/2', id_usuario será '2'.
-  // Na URL '/admin/usuarios/novo', id_usuario será 'undefined'.
   const { id_usuario } = useParams();
-
-  // 3. Verificamos se estamos em modo de edição
   const isEditMode = Boolean(id_usuario);
 
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState(''); // Senha só é obrigatória na criação
+  const [senha, setSenha] = useState('');
   const [perfil, setPerfil] = useState('Socorrista');
   const [message, setMessage] = useState('');
 
-  // 4. useEffect para buscar dados do usuário SE estivermos em modo de edição
   useEffect(() => {
     if (isEditMode) {
       const fetchUsuario = async () => {
         try {
-          const response = await fetch(`http://localhost:5000/api/usuarios/${id_usuario}`);
+          // --- ALTERAÇÃO 1 AQUI ---
+          // ANTES: const response = await fetch(`http://localhost:5000/api/usuarios/${id_usuario}`);
+          // DEPOIS:
+          const response = await fetch(`${import.meta.env.VITE_API_URL}/api/usuarios/${id_usuario}`);
+
           const data = await response.json();
           if (response.ok) {
-            // 5. Preenchemos os estados com os dados do usuário buscado
             setNome(data.Nome);
             setEmail(data.Email);
             setPerfil(data.Perfil);
@@ -40,26 +36,27 @@ function UsuarioFormPage() {
       };
       fetchUsuario();
     }
-  }, [id_usuario, isEditMode]); // Roda o efeito quando o componente monta ou se o ID mudar
+  }, [id_usuario, isEditMode]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     
-    // 6. A lógica de submissão agora diferencia entre Editar (PUT) e Criar (POST)
-    const url = isEditMode 
-      ? `http://localhost:5000/api/usuarios/${id_usuario}` 
-      : 'http://localhost:5000/api/usuarios';
+    // --- ALTERAÇÃO 2 AQUI (na variável 'url' e no 'fetch' final) ---
+    // A variável 'url' agora guarda apenas o caminho, não a URL completa
+    const urlPath = isEditMode 
+      ? `/api/usuarios/${id_usuario}` 
+      : '/api/usuarios';
       
     const method = isEditMode ? 'PUT' : 'POST';
 
-    // No modo de edição, não enviamos a senha se ela não for alterada
     const payload = { nome, email, perfil };
     if (!isEditMode || (isEditMode && senha)) {
       payload.senha = senha;
     }
 
     try {
-      const response = await fetch(url, {
+      // A URL completa é montada aqui, usando a variável de ambiente
+      const response = await fetch(`${import.meta.env.VITE_API_URL}${urlPath}`, {
         method: method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -77,10 +74,10 @@ function UsuarioFormPage() {
     }
   };
 
+  // O JSX do return continua o mesmo
   return (
     <div className="login-container">
       <form className="login-form" onSubmit={handleSubmit}>
-        {/* 7. Título dinâmico */}
         <h2>{isEditMode ? 'Editar Usuário' : 'Criar Novo Usuário'}</h2>
         {message && <p className="feedback-message">{message}</p>}
 

@@ -21,7 +21,8 @@ function InsumoFormPage() {
     if (isEditMode) {
       const fetchInsumo = async () => {
         try {
-          const response = await fetch(`http://localhost:5000/api/insumos/${id_insumo}`);
+          // --- ALTERAÇÃO 1 AQUI ---
+          const response = await fetch(`${import.meta.env.VITE_API_URL}/api/insumos/${id_insumo}`);
           const data = await response.json();
           if (response.ok) {
             setFormData({
@@ -36,7 +37,7 @@ function InsumoFormPage() {
             throw new Error(data.message);
           }
         } catch (err) {
-          setMessage(`Erro ao carregar dados: ${err.message}`);
+          setMessage(`Erro ao carregar dados do insumo: ${err.message}`);
         }
       };
       fetchInsumo();
@@ -54,32 +55,24 @@ function InsumoFormPage() {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    // A CORREÇÃO: 'url' agora é sempre apenas o caminho (path), e não a URL completa.
-    const url = isEditMode 
+    // --- ALTERAÇÃO 2 AQUI ---
+    // A variável 'urlPath' agora guarda apenas o caminho
+    const urlPath = isEditMode 
       ? `/api/insumos/${id_insumo}` 
       : '/api/insumos';
-
     const method = isEditMode ? 'PUT' : 'POST';
 
-    const insumoPayload = {
-      nome_insumo: formData.nome_insumo,
-      unidade_medida: formData.unidade_medida,
-      quantidade_minima: parseInt(formData.quantidade_minima, 10),
-      descricao: formData.descricao,
-      critico: formData.critico,
-      categoria: formData.categoria
-    };
-
     try {
-      // A URL completa é montada apenas aqui, uma única vez.
-      const response = await fetch(`http://localhost:5000${url}`, {
+      // A URL completa é montada aqui, usando a variável de ambiente
+      const response = await fetch(`${import.meta.env.VITE_API_URL}${urlPath}`, {
         method: method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(insumoPayload),
+        body: JSON.stringify({
+          ...formData,
+          quantidade_minima: parseInt(formData.quantidade_minima, 10),
+        }),
       });
-
       const data = await response.json();
-
       if (response.ok) {
         alert(`Insumo ${isEditMode ? 'atualizado' : 'criado'} com sucesso!`);
         navigate('/admin/insumos');
@@ -101,8 +94,6 @@ function InsumoFormPage() {
           <label>Nome do Insumo</label>
           <input type="text" name="nome_insumo" value={formData.nome_insumo} onChange={handleInputChange} required />
         </div>
-        {/* Adicione aqui os outros inputs para os campos restantes, seguindo o mesmo padrão */}
-        {/* Exemplo para Unidade de Medida: */}
         <div className="input-group">
           <label>Unidade de Medida</label>
           <input type="text" name="unidade_medida" value={formData.unidade_medida} onChange={handleInputChange} required />
@@ -111,11 +102,19 @@ function InsumoFormPage() {
           <label>Quantidade Mínima</label>
           <input type="number" name="quantidade_minima" value={formData.quantidade_minima} onChange={handleInputChange} required />
         </div>
+        <div className="input-group">
+          <label>Descrição (Opcional)</label>
+          <input type="text" name="descricao" value={formData.descricao} onChange={handleInputChange} />
+        </div>
+        <div className="input-group">
+          <label>Categoria (Opcional)</label>
+          <input type="text" name="categoria" value={formData.categoria} onChange={handleInputChange} />
+        </div>
         <div className="input-group" style={{ flexDirection: 'row', alignItems: 'center', gap: '10px' }}>
           <label>Item Crítico?</label>
           <input type="checkbox" name="critico" checked={formData.critico} onChange={handleInputChange} />
         </div>
-
+        
         <button type="submit">Salvar Insumo</button>
       </form>
     </div>

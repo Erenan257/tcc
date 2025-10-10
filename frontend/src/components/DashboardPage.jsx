@@ -21,7 +21,9 @@ function DashboardPage({ usuario }) {
         <button className="dashboard-button" onClick={() => navigate('/pedidos')}>
           Visualizar Status dos Pedidos
         </button>
-        <button className="dashboard-button">Visualizar Inventário</button>
+        <button className="dashboard-button" onClick={() => navigate('/inventario')}>
+          Visualizar Inventário
+        </button>
       </main>
     </div>
   );

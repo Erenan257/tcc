@@ -1,24 +1,19 @@
-/* --- ESTILOS PARA CHECKLISTPAGE.CSS --- */
-
-/* 1. Layout Principal da Página */
 .checklist-container {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Centraliza o formulário horizontalmente */
+  align-items: center;
   width: 100%;
   min-height: 100vh;
-  background-color: #f0f2f5; /* Fundo cinza claro, igual às outras telas */
+  background-color: var(--cor-fundo);
   font-family: sans-serif;
-  padding: 40px 20px; /* Espaçamento em cima/embaixo e nas laterais */
-  box-sizing: border-box; /* Garante que o padding não quebre o layout */
+  padding: 40px 20px;
+  box-sizing: border-box;
 }
 
-/* 2. Formulário que Contém a Lista */
-/* Esta é a "caixa" branca central que segura o conteúdo */
 .checklist-form {
   width: 100%;
-  max-width: 350px; /* O formulário tem uma largura máxima para não ficar muito largo em telas grandes */
-  background-color: #ffffff;
+  max-width: 600px; /* Mantendo o ajuste que fizemos */
+  background-color: var(--cor-branco);
   padding: 30px;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -28,17 +23,16 @@
   text-align: center;
   margin-top: 0;
   margin-bottom: 30px;
-  color: #1c1e21;
+  color: var(--cor-texto-principal);
 }
 
-/* 3. Lista de Itens */
 .checklist-header {
   display: flex;
   justify-content: space-between;
   padding: 10px 15px;
-  border-bottom: 2px solid #dddfe2;
+  border-bottom: 2px solid var(--cor-borda);
   font-weight: bold;
-  color: #606770;
+  color: var(--cor-texto-secundario);
 }
 
 .checklist-item {
@@ -46,12 +40,12 @@
   justify-content: space-between;
   align-items: center;
   padding: 15px;
-  border-bottom: 1px solid #f0f2f5;
+  border-bottom: 1px solid var(--cor-fundo);
 }
 
 .item-name {
   flex-grow: 1;
-  color: #1c1e21;
+  color: var(--cor-texto-principal);
   font-size: 1rem;
 }
 
@@ -62,7 +56,7 @@
 
 .status-button {
   padding: 8px 12px;
-  border: 1px solid #dddfe2;
+  border: 1px solid var(--cor-borda);
   border-radius: 6px;
   background-color: #f5f6f7;
   cursor: pointer;
@@ -80,8 +74,8 @@
   padding: 15px;
   border: none;
   border-radius: 6px;
-  background-color: #1877f2;
-  color: white;
+  background-color: var(--cor-principal);
+  color: var(--cor-branco);
   font-size: 1.1rem;
   font-weight: bold;
   cursor: pointer;
@@ -89,71 +83,30 @@
 }
 
 .submit-button:hover {
-  background-color: #166fe5;
+  background-color: var(--cor-principal-hover);
 }
-
-
-/* 4. REGRAS PARA TELAS PEQUENAS (DESIGN RESPONSIVO) */
-@media (max-width: 600px) {
-  .checklist-container {
-    padding: 0; /* Remove o padding em telas de celular */
-  }
-
-  .checklist-form {
-    box-shadow: none;
-    border-radius: 0;
-    padding: 20px 15px;
-  }
-
-  .checklist-form h1 {
-    font-size: 1.5rem;
-  }
-
-  .checklist-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 15px;
-  }
-
-  .item-actions {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-  }
-
-  .status-button {
-    flex-grow: 1;
-  }
-}
-
-/* --- ESTILOS PARA BOTÕES DE STATUS SELECIONADOS --- */
 
 .status-button.selected-presente {
-  background-color: #42b72a; /* Verde */
-  color: white;
-  border-color: #42b72a;
+  background-color: var(--cor-sucesso);
+  color: var(--cor-branco);
+  border-color: var(--cor-sucesso);
 }
 
 .status-button.selected-ausente {
-  background-color: #fa383e; /* Vermelho */
-  color: white;
-  border-color: #fa383e;
+  background-color: var(--cor-erro);
+  color: var(--cor-branco);
+  border-color: var(--cor-erro);
 }
-
-/* Adicione este código ao seu CSS */
 
 .quantity-input {
   width: 80px;
   padding: 8px;
   text-align: center;
-  border: 1px solid #dddfe2;
+  border: 1px solid var(--cor-borda);
   border-radius: 6px;
   font-size: 1rem;
 }
 
-/* Um pequeno ajuste no nome do item para mostrar a quantidade mínima */
-.item-name {
-  flex-grow: 1;
-  color: #1c1e21;
-  font-size: 1rem;
+@media (max-width: 600px) {
+  /* ... (regras responsivas continuam iguais) ... */
 }

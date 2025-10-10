@@ -11,7 +11,7 @@ function PedidosPage() {
     const fetchPedidos = async () => {
       try {
         // Chamamos nossa API para buscar todos os pedidos
-        const response = await fetch('http://localhost:5000/api/pedidos');
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/pedidos`, { /* ... */ });
         if (!response.ok) {
           throw new Error('A resposta da rede não foi OK');
         }

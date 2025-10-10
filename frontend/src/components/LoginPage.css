@@ -1,16 +1,14 @@
-/* Centraliza o container do login na tela inteira */
 .login-container {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #f0f2f5;
+  background-color: var(--cor-fundo); /* Usa a variável */
   font-family: sans-serif;
 }
 
-/* Estiliza a caixa do formulário */
 .login-form {
-  background: white;
+  background: var(--cor-branco); /* Usa a variável */
   padding: 40px;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -21,10 +19,9 @@
 
 .login-form h2 {
   margin-bottom: 24px;
-  color: #1c1e21;
+  color: var(--cor-texto-principal); /* Usa a variável */
 }
 
-/* Agrupa label e input */
 .input-group {
   margin-bottom: 16px;
   text-align: left;
@@ -33,26 +30,25 @@
 .input-group label {
   display: block;
   margin-bottom: 8px;
-  color: #606770;
+  color: var(--cor-texto-secundario); /* Usa a variável */
   font-weight: bold;
 }
 
 .input-group input {
   width: 100%;
   padding: 12px;
-  border: 1px solid #dddfe2;
+  border: 1px solid var(--cor-borda); /* Usa a variável */
   border-radius: 6px;
   font-size: 16px;
 }
 
-/* Estiliza o botão de entrar */
 button[type="submit"] {
   width: 100%;
   padding: 12px;
   border: none;
   border-radius: 6px;
-  background-color: #1877f2;
-  color: white;
+  background-color: var(--cor-principal); /* Usa a variável */
+  color: var(--cor-branco);
   font-size: 18px;
   font-weight: bold;
   cursor: pointer;
@@ -60,14 +56,13 @@ button[type="submit"] {
 }
 
 button[type="submit"]:hover {
-  background-color: #166fe5;
+  background-color: var(--cor-principal-hover); /* Usa a variável */
 }
 
-/* Estiliza o link de "Esqueci minha senha" */
 .forgot-password {
   display: block;
   margin-top: 16px;
-  color: #1877f2;
+  color: var(--cor-principal); /* Usa a variável */
   text-decoration: none;
   font-size: 14px;
 }
@@ -76,11 +71,12 @@ button[type="submit"]:hover {
   text-decoration: underline;
 }
 
+/* Estilo para a mensagem de feedback */
 .feedback-message {
-  color: rgb(0, 0, 0) !important;
-  font-weight: bold !important;
-  border: 1px solid green !important;
-  padding: 10px !important;
-  margin-bottom: 1rem !important;
+  padding: 10px;
+  margin-bottom: 1rem;
   border-radius: 5px;
+  font-weight: bold;
+  border: 1px solid transparent;
+  /* (Pode ser melhorado para ter cores de sucesso/erro) */
 }

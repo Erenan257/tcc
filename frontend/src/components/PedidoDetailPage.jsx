@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
-// 1. Importamos useParams para ler o ID da URL e useNavigate para voltar
 import { useParams, useNavigate } from 'react-router-dom';
-// Reutilizaremos o CSS da página de pedidos
 import './PedidosPage.css'; 
 
 function PedidoDetailPage() {
-  // 2. useParams nos dá um objeto com os parâmetros da URL. Ex: { id_pedido: '1' }
   const { id_pedido } = useParams();
   const navigate = useNavigate();
 
@@ -13,11 +10,14 @@ function PedidoDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // 3. useEffect busca os detalhes do pedido específico usando o ID da URL
   useEffect(() => {
     const fetchPedido = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/pedidos/${id_pedido}`);
+        // --- ALTERAÇÃO 1 AQUI ---
+        // ANTES: const response = await fetch(`http://localhost:5000/api/pedidos/${id_pedido}`);
+        // DEPOIS:
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/pedidos/${id_pedido}`);
+        
         if (!response.ok) {
           throw new Error('Pedido não encontrado');
         }
@@ -30,21 +30,24 @@ function PedidoDetailPage() {
       }
     };
     fetchPedido();
-  }, [id_pedido]); // O efeito roda novamente se o id_pedido mudar
+  }, [id_pedido]);
 
-  // Função para marcar o pedido como atendido
   const handleAtenderPedido = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/pedidos/${id_pedido}`, {
+      // --- ALTERAÇÃO 2 AQUI ---
+      // ANTES: const response = await fetch(`http://localhost:5000/api/pedidos/${id_pedido}`, { ... });
+      // DEPOIS:
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/pedidos/${id_pedido}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'Atendido' })
       });
+
       if (!response.ok) {
         throw new Error('Não foi possível atualizar o status.');
       }
       alert('Pedido marcado como "Atendido" com sucesso!');
-      navigate('/admin/pedidos'); // Volta para a lista de pedidos
+      navigate('/admin/pedidos');
     } catch (err) {
       alert(`Erro: ${err.message}`);
     }
@@ -54,6 +57,7 @@ function PedidoDetailPage() {
   if (error) return <p>Erro: {error}</p>;
   if (!pedido) return <p>Pedido não encontrado.</p>;
 
+  // O JSX do return continua o mesmo
   return (
     <div className="pedidos-container">
       <h1>Detalhes do Pedido #{pedido.ID_Pedido}</h1>
@@ -66,19 +70,18 @@ function PedidoDetailPage() {
 
       <h2>Itens Solicitados</h2>
       <div className="pedidos-list">
-        <div className="pedido-header">
+        <div className="pedido-header" style={{gridTemplateColumns: '3fr 1fr'}}>
           <span>Insumo</span>
-          <span>Quantidade</span>
+          <span style={{textAlign: 'center'}}>Quantidade</span>
         </div>
         {pedido.itens.map((item, index) => (
-          <div className="pedido-item" key={index}>
+          <div className="pedido-item" key={index} style={{gridTemplateColumns: '3fr 1fr'}}>
             <span>{item.Nome_Insumo}</span>
-            <span>{item.Quantidade_Solicitada}</span>
+            <span style={{textAlign: 'center'}}>{item.Quantidade_Solicitada}</span>
           </div>
         ))}
       </div>
 
-      {/* O botão de atender só aparece se o pedido estiver pendente */}
       {pedido.Status_Pedido === 'Pendente' && (
         <button onClick={handleAtenderPedido} className="submit-button">
           Marcar como Atendido

@@ -14,7 +14,7 @@ function ChecklistPage() {
     // ... (a lógica do useEffect para buscar os insumos continua exatamente a mesma)
     const fetchInsumos = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/insumos');
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/insumos`);
         if (!response.ok) { throw new Error('A resposta da rede não foi OK'); }
         const data = await response.json();
         setInsumos(data);
@@ -56,11 +56,13 @@ function ChecklistPage() {
     };
 
     try {
-      const response = await fetch('http://localhost:5000/api/checklists', {
+      // --- AQUI ESTÁ A CORREÇÃO ---
+      // Todas as opções (method, headers, body) devem estar DENTRO do mesmo objeto {}
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/checklists`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(checklistPayload)
-      });
+      }); // O objeto de opções e a chamada do fetch terminam aqui
       
       const data = await response.json();
       

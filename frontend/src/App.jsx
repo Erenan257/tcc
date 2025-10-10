@@ -9,6 +9,7 @@ import PedidoDetailPage from './components/PedidoDetailPage';
 import UsuarioFormPage from './components/UsuarioFormPage';
 import AdminInsumosPage from './components/AdminInsumosPage';
 import InsumoFormPage from './components/InsumoFormPage';
+import InventarioPage from './components/InventarioPage';
 import './App.css';
 
 function AppRoutes() {
@@ -70,25 +71,29 @@ function AppRoutes() {
         element={usuarioLogado ? <AdminUsuariosPage /> : <Navigate to="/" />} 
       />
       <Route 
-          path="/admin/usuarios/novo" 
-          element={usuarioLogado ? <UsuarioFormPage /> : <Navigate to="/" />} 
-        />
+        path="/admin/usuarios/novo" 
+        element={usuarioLogado ? <UsuarioFormPage /> : <Navigate to="/" />} 
+      />
       <Route 
-          path="/admin/usuarios/:id_usuario" 
-          element={usuarioLogado ? <UsuarioFormPage /> : <Navigate to="/" />} 
-        />
+        path="/admin/usuarios/:id_usuario" 
+        element={usuarioLogado ? <UsuarioFormPage /> : <Navigate to="/" />} 
+      />
       <Route 
-          path="/admin/insumos" 
-          element={usuarioLogado ? <AdminInsumosPage /> : <Navigate to="/" />} 
-        />
+        path="/admin/insumos" 
+        element={usuarioLogado ? <AdminInsumosPage /> : <Navigate to="/" />} 
+      />
       <Route 
-          path="/admin/insumos/novo" 
-          element={usuarioLogado ? <InsumoFormPage /> : <Navigate to="/" />} 
-        />
+        path="/admin/insumos/novo" 
+        element={usuarioLogado ? <InsumoFormPage /> : <Navigate to="/" />} 
+      />
       <Route 
-          path="/admin/insumos/:id_insumo" 
-          element={usuarioLogado ? <InsumoFormPage /> : <Navigate to="/" />} 
-        />
+        path="/admin/insumos/:id_insumo" 
+        element={usuarioLogado ? <InsumoFormPage /> : <Navigate to="/" />} 
+      />
+      <Route 
+        path="/inventario" 
+        element={usuarioLogado ? <InventarioPage /> : <Navigate to="/" />} 
+      />
     </Routes>
   );
 }

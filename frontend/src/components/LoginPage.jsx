@@ -11,11 +11,14 @@ function LoginPage({ onLoginSuccess }) {
     setMessage('');
 
     try {
-      const response = await fetch('http://localhost:5000/api/login', {
+      // --- AQUI ESTÁ A CORREÇÃO ---
+      // O segundo argumento do fetch é um único objeto de opções,
+      // começando com { e terminando com }
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email, senha: password }),
-      });
+      }); // A chamada do fetch e seu objeto de opções terminam aqui
 
       const data = await response.json();
 
@@ -23,7 +26,6 @@ function LoginPage({ onLoginSuccess }) {
         // Se o login deu certo, ele apenas CHAMA A FUNÇÃO que recebeu do App.jsx
         console.log('Login API OK! Avisando o componente App.jsx com os dados:', data.usuario);
         onLoginSuccess(data.usuario);
-        // A linha 'navigate(...)' FOI REMOVIDA daqui
       } else {
         setMessage(data.message);
       }
