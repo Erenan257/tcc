@@ -53,19 +53,33 @@ function InsumoFormPage() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const url = isEditMode ? `http://localhost:5000/api/insumos/${id_insumo}` : '/api/insumos';
+
+    // A CORREÇÃO: 'url' agora é sempre apenas o caminho (path), e não a URL completa.
+    const url = isEditMode 
+      ? `/api/insumos/${id_insumo}` 
+      : '/api/insumos';
+
     const method = isEditMode ? 'PUT' : 'POST';
 
+    const insumoPayload = {
+      nome_insumo: formData.nome_insumo,
+      unidade_medida: formData.unidade_medida,
+      quantidade_minima: parseInt(formData.quantidade_minima, 10),
+      descricao: formData.descricao,
+      critico: formData.critico,
+      categoria: formData.categoria
+    };
+
     try {
+      // A URL completa é montada apenas aqui, uma única vez.
       const response = await fetch(`http://localhost:5000${url}`, {
         method: method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          quantidade_minima: parseInt(formData.quantidade_minima, 10),
-        }),
+        body: JSON.stringify(insumoPayload),
       });
+
       const data = await response.json();
+
       if (response.ok) {
         alert(`Insumo ${isEditMode ? 'atualizado' : 'criado'} com sucesso!`);
         navigate('/admin/insumos');
