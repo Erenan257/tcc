@@ -80,3 +80,13 @@ button[type="submit"]:hover {
   border: 1px solid transparent;
   /* (Pode ser melhorado para ter cores de sucesso/erro) */
 }
+
+/* --- AJUSTES RESPONSIVOS PARA FORMULÁRIOS --- */
+
+@media (max-width: 600px) {
+  .login-form {
+    /* Em telas pequenas, removemos o padding excessivo e a sombra */
+    padding: 20px;
+    box-shadow: none;
+  }
+}

@@ -101,3 +101,41 @@
   text-decoration: none;
   font-size: 14px;
 }
+
+/* --- AJUSTES RESPONSIVOS PARA AS LISTAS DE ADMIN --- */
+
+@media (max-width: 768px) {
+  /* Esconde o cabeçalho da tabela em telas pequenas */
+  .pedido-header {
+    display: none;
+  }
+
+  .pedido-item {
+    /* Muda o layout de grid para bloco */
+    display: block;
+    border: 1px solid var(--cor-borda);
+    border-radius: 8px;
+    margin-bottom: 15px;
+    padding: 15px;
+  }
+
+  /* Adiciona "labels" antes de cada informação para dar contexto */
+  .pedido-item span::before {
+    content: attr(data-label); /* Pega o texto do atributo data-label */
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+    color: var(--cor-texto-secundario);
+  }
+
+  .pedido-item span {
+    display: block; /* Faz cada span ocupar uma linha */
+    margin-bottom: 10px;
+    width: 100%;
+  }
+
+  .item-actions {
+    justify-content: flex-start; /* Alinha os botões à esquerda */
+    margin-top: 10px;
+  }
+}

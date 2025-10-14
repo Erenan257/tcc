@@ -4,10 +4,9 @@ from flask import Blueprint, request, jsonify
 from app import get_db_connection
 import mysql.connector
 
-bp = Blueprint('insumos', __name__, url_prefix='/api/insumos')
+bp = Blueprint('insumos', __name__, url_prefix='/api')
 
-# Rota para LISTAR todos os insumos (GET) e CRIAR um novo insumo (POST)
-@bp.route('/', methods=['GET', 'POST'])
+@bp.route('/insumos', methods=['GET', 'POST'])
 def handle_insumos():
     if request.method == 'GET':
         try:
@@ -42,8 +41,7 @@ def handle_insumos():
         except mysql.connector.Error as err:
             return jsonify({"status": "erro", "message": "Erro no banco de dados ao criar insumo.", "error": str(err)}), 500
 
-# Rota para EDITAR (PUT) e EXCLUIR (DELETE) um insumo específico
-@bp.route('/<int:id_insumo>', methods=['GET', 'PUT', 'DELETE'])
+@bp.route('/insumos/<int:id_insumo>', methods=['GET', 'PUT', 'DELETE'])
 def handle_insumo_by_id(id_insumo):
     if request.method == 'GET':
         try:
@@ -68,10 +66,7 @@ def handle_insumo_by_id(id_insumo):
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
-            sql = """UPDATE Insumo SET 
-                        Nome_Insumo = %s, Unidade_Medida = %s, Quantidade_Minima = %s, 
-                        Descricao = %s, Critico = %s, Categoria = %s
-                     WHERE ID_Insumo = %s"""
+            sql = "UPDATE Insumo SET Nome_Insumo = %s, Unidade_Medida = %s, Quantidade_Minima = %s, Descricao = %s, Critico = %s, Categoria = %s WHERE ID_Insumo = %s"
             cursor.execute(sql, (
                 dados['nome_insumo'], dados['unidade_medida'], dados['quantidade_minima'],
                 dados.get('descricao', ''), dados.get('critico', False), dados.get('categoria', ''),
