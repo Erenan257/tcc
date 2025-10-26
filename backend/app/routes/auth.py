@@ -7,7 +7,7 @@ import mysql.connector
 # O prefixo /api será adicionado antes de /login e /registrar
 bp = Blueprint('auth', __name__, url_prefix='/api')
 
-@bp.route('/api/login', methods=['POST'])
+@bp.route('/login', methods=['POST'])
 def login():
     dados = request.get_json()
     if not dados or not 'email' in dados or not 'senha' in dados:
