@@ -1,0 +1,135 @@
+#!/bin/bash
+set -e  # parar se algo der errado
+
+# --- Variáveis de Ambiente ---
+# Detecta o usuário e o diretório home automaticamente
+CURRENT_USER=$(whoami)
+USER_HOME=$HOME
+# -----------------------------
+
+LOGFILE="${USER_HOME}/install_tcc_lite.log"
+exec > >(tee -a "$LOGFILE") 2>&1
+
+echo "====================================="
+echo " Instalador TCC — Lite-Legacy Edition"
+echo " Iniciando em: $(date)"
+echo "====================================="
+
+echo "1) Atualizando sistema..."
+sudo apt update
+sudo apt upgrade -y
+
+echo "2) Instalando pacotes básicos..."
+# Alterado para mariadb-server como você perguntou antes
+sudo apt install -y git python3 python3-venv python3-pip \
+                   nodejs npm nginx mariadb-server
+
+echo "3) Verificando serviço MariaDB..."
+if sudo systemctl status mariadb >/dev/null 2>&1; then
+    echo "MariaDB já ativo."
+else
+    echo "MariaDB não está ativo — tentando iniciar..."
+    sudo systemctl start mariadb
+    sleep 5
+    sudo systemctl status mariadb || { echo "Erro: MariaDB não pôde iniciar"; exit 1; }
+fi
+
+echo "4) Clonando repositório do TCC..."
+# Alterado para usar a variável $USER_HOME
+cd ${USER_HOME}
+git clone https://github.com/Erenan257/tcc.git || \
+    { echo "Repositório já existe ou clonagem falhou, continuando..."; }
+cd tcc
+
+echo "5) Backend setup (Python)..."
+cd backend
+python3 -m venv venv
+source venv/bin/activate
+if [ -f requirements.txt ]; then
+    pip install -r requirements.txt
+else
+    echo "Aviso: requirements.txt não encontrado, instalando dependências básicas."
+    pip install flask flask-bcrypt flask-cors mysql-connector-python
+fi
+
+echo "6) Banco de dados MariaDB – criando e importando schema..."
+DB_NAME="emlog_db"
+DB_USER="root"
+
+# Correção de segurança: Perguntar a senha
+echo "Por favor, digite a senha 'root' do MariaDB:"
+read -s DB_PASS 
+
+mysql -u ${DB_USER} -p"${DB_PASS}" -e "CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\`;" || \
+    { echo "Erro na criação do banco"; exit 1; }
+if [ -f ../schema.sql ]; then
+    mysql -u ${DB_USER} -p"${DB_PASS}" ${DB_NAME} < ../schema.sql || \
+        { echo "Erro na importação do schema"; exit 1; }
+else
+    echo "Aviso: schema.sql não encontrado — talvez manualmente necessário.";
+fi
+
+echo "7) Criando serviço systemd para backend..."
+# Alterado para usar as variáveis de usuário e home
+sudo tee /etc/systemd/system/tcc-backend.service > /dev/null <<EOF
+[Unit]
+Description=TCC Backend Service
+After=network.target mariadb.service
+
+[Service]
+Type=simple
+User=${CURRENT_USER}
+WorkingDirectory=${USER_HOME}/tcc/backend
+ExecStart=${USER_HOME}/tcc/backend/venv/bin/python3 main.py
+Restart=always
+Environment=PATH=${USER_HOME}/tcc/backend/venv/bin:/usr/bin:/bin
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo systemctl daemon-reload
+sudo systemctl enable tcc-backend.service
+sudo systemctl restart tcc-backend.service
+
+echo "8) Frontend setup (NodeJS)..."
+cd ../frontend
+npm install || { echo "Erro npm install"; exit 1; }
+npm run build || { echo "Erro npm run build"; exit 1; }
+
+echo "9) Configurando Nginx..."
+# Alterado para usar a variável $USER_HOME
+sudo tee /etc/nginx/sites-available/tcc > /dev/null <<EOF
+server {
+    listen 80;
+    server_name _;
+
+    root ${USER_HOME}/tcc/frontend/build;
+    index index.html;
+
+    location / {
+        try_files \$uri /index.html;
+    }
+
+    location /api/ {
+        proxy_pass http://127.0.0.1:5000/;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+    }
+
+    access_log /var/log/nginx/tcc_access.log;
+    error_log /var/log/nginx/tcc_error.log;
+}
+EOF
+
+sudo ln -sf /etc/nginx/sites-available/tcc /etc/nginx/sites-enabled/tcc
+sudo rm -f /etc/nginx/sites-enabled/default
+sudo nginx -t || { echo "Erro na sintaxe Nginx"; exit 1; }
+sudo systemctl restart nginx
+
+echo "====================================="
+echo "Instalação completa! ✅"
+IP_ADDR=$(hostname -I | awk '{print $1}')
+echo "Abra no seu navegador -> http://${IP_ADDR}/"
+echo "Log completo em ${LOGFILE}"
+echo "====================================="
