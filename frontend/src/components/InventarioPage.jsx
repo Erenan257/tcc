@@ -12,7 +12,7 @@ function InventarioPage() {
     const fetchInsumos = async () => {
       try {
         // Reutilizamos a API que lista todos os insumos
-        const response = await fetch('http://localhost:5000/api/insumos');
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/insumos`);
         if (!response.ok) {
           throw new Error('A resposta da rede não foi OK');
         }
